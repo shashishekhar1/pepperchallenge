@@ -6,7 +6,7 @@
 		var self = this;
 
 		self.getCustomers = function(){
-			var promise1 = $http.get('http://localhost:8091/customers');
+			var promise1 = $http.get('http://localhost:8091/v1/customers');
 			var promise2 = promise1.then(function(response){
 				return response.data;
 			});
@@ -15,7 +15,7 @@
 		}
 		
 		self.saveCustomerData = function(userData){
-		 return	$http.put('http://localhost:8091/customers' + userData.id, userData)
+		 return	$http.patch('http://localhost:8091/v1/customers' + userData.id, userData)
 			.then(function(reponse){
 				console.log(reponse);
 			});
@@ -23,7 +23,7 @@
 		}
 		
 		self.addNewCustomer = function(userData){
-			return $http.post('http://localhost:8091/customers', userData)
+			return $http.post('http://localhost:8091/v1/customers', userData)
 			.then(function(response){
 				console.log(response);
 			});
