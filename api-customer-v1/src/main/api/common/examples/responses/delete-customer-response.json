@@ -1,0 +1,7 @@
+{
+    "data": 
+    	"type": "DeleteCustomer",
+	    "attributes": {
+	    		"status": "deleted"
+	        }
+}

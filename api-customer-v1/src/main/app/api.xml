@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+    <flow name="api-main">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/v1/*" doc:name="HTTP"/>
+        <apikit:router config-ref="api-config" doc:name="APIkit Router"/>
+        <exception-strategy ref="Global_Choice_Exception_Strategy" doc:name="Reference Exception Strategy"/>
+    </flow>
+
+    <flow name="api-console">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/console/*" doc:name="HTTP"/>
+        <apikit:console config-ref="api-config" doc:name="APIkit Console"/>
+    </flow>
+
+    <flow name="delete:/customers/{id}:api-config">
+        <message-properties-transformer doc:name="Message Properties" scope="invocation">
+            <add-message-property key="id" value="#[message.inboundProperties.'http.uri.params'.id]"/>
+        </message-properties-transformer>
+        <choice doc:name="Request Validation">
+            <when expression="#[flowVars.id != '']">
+                <flow-ref name="delete-customers-flow" doc:name="Delete Customer"/>
+            </when>
+            <otherwise>
+            	<message-properties-transformer doc:name="Set HTTP Status">
+                    <add-message-property key="http.status" value="400"/>
+                </message-properties-transformer>
+            	<logger message="customer-id-is-mandatory" level="DEBUG" doc:name="log-delete-customer-validation"/>
+			</otherwise>
+        </choice>
+        <remove-property propertyName="MULE_*" doc:name="Strip MULE_* Headers"/>
+        <logger message="delete-customers-response.flow" level="DEBUG" doc:name="log-delete-customer-response"/>
+    </flow>
+
+    <flow name="patch:/customers/{id}:api-config">
+        <message-properties-transformer doc:name="Message Properties" scope="invocation">
+            <add-message-property key="id" value="#[message.inboundProperties.'http.uri.params'.id]"/>
+        </message-properties-transformer>
+        <choice doc:name="Request Validation">
+            <when expression="#[flowVars.id != '']">
+                <flow-ref name="update-customers-flow" doc:name="Update Customer"/>
+            </when>
+            <otherwise>
+            	<message-properties-transformer doc:name="Set HTTP Status">
+                    <add-message-property key="http.status" value="400"/>
+                </message-properties-transformer>
+            	<logger message="customer-id-is-mandatory" level="DEBUG" doc:name="log-update-customer-validation"/>
+			</otherwise>
+        </choice>
+		<remove-property propertyName="MULE_*" doc:name="Strip MULE_* Headers"/>
+		<logger message="update-customers-response.flow" level="DEBUG" doc:name="log-update-customer-response"/>
+    </flow>
+
+    <flow name="get:/customers:api-config">
+        <message-properties-transformer doc:name="Message Properties" scope="invocation">
+            <add-message-property key="requestedTimestamp" value="#[message.inboundProperties.'http.query.params'.lastRequestedTimestamp]"/>
+        </message-properties-transformer>
+        <flow-ref name="get-customers-flow" doc:name="Get Customer"/>
+        <remove-property propertyName="MULE_*" doc:name="Strip MULE_* Headers"/>
+        <logger message="get-customers-response.flow" level="DEBUG" doc:name="log-get-customer-response"/>
+    </flow>
+
+	<flow name="get:/customers/{id}:api-config">
+        <message-properties-transformer doc:name="Message Properties" scope="invocation">
+            <add-message-property key="id" value="#[message.inboundProperties.'http.uri.params'.id]"/>
+        </message-properties-transformer>
+        <choice doc:name="Request Validation">
+            <when expression="#[flowVars.id != '']">
+                <flow-ref name="get-customers-by-id-flow" doc:name="Get Customer By ID"/>
+            </when>
+            <otherwise>
+            	<message-properties-transformer doc:name="Set HTTP Status">
+                    <add-message-property key="http.status" value="400"/>
+                </message-properties-transformer>
+            	<logger message="customer-id-is-mandatory" level="DEBUG" doc:name="log-get-customer-validation-error"/>
+			</otherwise>
+        </choice>
+        <remove-property propertyName="MULE_*" doc:name="Strip MULE_* Headers"/>
+        <logger message="get-customers-response.flow" level="DEBUG" doc:name="log-get-customer-response"/>
+    </flow>
+
+    <flow name="post:/customers:api-config">
+        <flow-ref name="add-customers-flow" doc:name="Add Customer"/>
+		<remove-property propertyName="MULE_*" doc:name="Strip MULE_* Headers"/>
+        <message-properties-transformer doc:name="Set HTTP Status">
+            <add-message-property key="http.status" value="201"/>
+        </message-properties-transformer>
+        <logger message="create-customers-response.flow" level="DEBUG" doc:name="log-create-customer-response"/>
+    </flow>
+
+</mule>

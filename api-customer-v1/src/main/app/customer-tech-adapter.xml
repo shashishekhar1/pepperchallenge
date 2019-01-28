@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
+	xmlns:api-platform-gw="http://www.mulesoft.org/schema/mule/api-platform-gw"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:utils="http://www.mulesoft.org/schema/mule/utils"
+	xmlns:s3="http://www.mulesoft.org/schema/mule/s3" xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/utils http://www.mulesoft.org/schema/mule/utils/current/mule-utils.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/api-platform-gw http://www.mulesoft.org/schema/mule/api-platform-gw/current/mule-api-platform-gw.xsd
+http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+
+	<sub-flow name="get-customers-flow">
+        <logger message="get-customers-request.flow" level="DEBUG" doc:name="log-get-customer-request"/>
+        <flow-ref name="db-get-customer-db-flow" doc:name="get-all-customers.flow"/>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <scripting:component doc:name="Get Customer Response Mapper">
+            <scripting:script engine="Groovy" file="mappings/get-customer-mapping-response.groovy"/>
+        </scripting:component>
+	</sub-flow>
+
+	<sub-flow name="get-customers-by-id-flow">
+        <logger message="get-customers-request.flow" level="DEBUG" doc:name="log-get-customer-request"/>
+        <flow-ref name="db-get-customer-by-id-flow" doc:name="db-get-customer-by-id-flow"/>
+        <choice doc:name="Get Response Mapper">
+            <when expression="#[payload != []]">
+            	<json:object-to-json-transformer doc:name="Object to JSON"/>
+                <scripting:component doc:name="Get Customer Response">
+		            <scripting:script engine="Groovy" file="mappings/get-customer-by-id-mapping-response.groovy"/>
+		        </scripting:component>
+                <message-properties-transformer doc:name="Set HTTP Status">
+                    <add-message-property key="http.status" value="200"/>
+                </message-properties-transformer>
+            </when>
+            <otherwise>
+            	<message-properties-transformer doc:name="Set HTTP Status">
+                    <add-message-property key="http.status" value="404"/>
+                </message-properties-transformer>
+                <set-variable variableName="#[payload]" value="" doc:name="Set Payload"/>
+            	<logger message="customer-id-not-found" level="DEBUG" doc:name="log-update-customer-response"/>
+			</otherwise>
+        </choice>
+	</sub-flow>
+
+	<sub-flow name="add-customers-flow">
+        <logger message="add-customers-request.flow" level="DEBUG" doc:name="log-create-customer-request"/>
+        <scripting:component doc:name="Create Customer Mapping">
+            <scripting:script engine="Groovy" file="mappings/post-create-customer-mapping-request.groovy"></scripting:script>
+        </scripting:component>
+        <flow-ref name="db-create-customer-flow" doc:name="create-customers.flow"/>
+        <scripting:component doc:name="Create Customer Response">
+            <scripting:script engine="Groovy" file="mappings/post-create-customer-response.groovy"/>
+        </scripting:component>
+
+	</sub-flow>
+
+	<sub-flow name="update-customers-flow">
+        <logger message="update-customers-request.flow" level="DEBUG" doc:name="log-update-customer-request"/>
+        <scripting:component doc:name="Update Customer Mappings">
+            <scripting:script engine="Groovy" file="mappings/patch-updatecustomer-mapping-request.groovy"></scripting:script>
+        </scripting:component>
+        <flow-ref name="db-update-customer-flow" doc:name="update-customers.flow"/>
+        <choice doc:name="Update Response Mapper">
+            <when expression="#[payload == 1]">
+                <scripting:component doc:name="Update Customer Response">
+		            <scripting:script engine="Groovy" file="mappings/patch-update-customer-reponse.groovy"/>
+		        </scripting:component>
+                <message-properties-transformer doc:name="Set HTTP Status">
+                    <add-message-property key="http.status" value="200"/>
+                </message-properties-transformer>
+            </when>
+            <otherwise>
+            	<message-properties-transformer doc:name="Set HTTP Status">
+                    <add-message-property key="http.status" value="404"/>
+                </message-properties-transformer>
+                <set-variable variableName="#[payload]" value="" doc:name="Set Payload"/>
+            	<logger message="customer-id-not-found" level="DEBUG" doc:name="log-update-customer-response"/>
+			</otherwise>
+        </choice>
+	</sub-flow>
+
+	<sub-flow name="delete-customers-flow">
+        <logger message="delete-customers-request.flow" level="DEBUG" doc:name="log-delete-customer-request"/>
+        <flow-ref name="db-delete-customer-flow" doc:name="delete-customers.flow"/>
+        <choice doc:name="Delete Response Mapper">
+            <when expression="#[payload == 1]">
+                <scripting:component doc:name="Delete Customer Response">
+		            <scripting:script engine="Groovy" file="mappings/delete-customer-response.groovy"/>
+		        </scripting:component>
+                <message-properties-transformer doc:name="Set HTTP Status">
+                    <add-message-property key="http.status" value="200"/>
+                </message-properties-transformer>
+            </when>
+            <otherwise>
+            	<message-properties-transformer doc:name="Set HTTP Status">
+                    <add-message-property key="http.status" value="404"/>
+                </message-properties-transformer>
+                <set-variable variableName="#[payload]" value="" doc:name="Set Payload"/>
+            	<logger message="customer-id-not-found" level="DEBUG" doc:name="log-delete-customer-response"/>
+			</otherwise>
+        </choice>
+	</sub-flow>
+</mule>

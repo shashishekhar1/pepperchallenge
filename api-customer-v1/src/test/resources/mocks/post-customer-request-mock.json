@@ -1,0 +1,15 @@
+{
+    "data": {
+    	"type": "CreateCustomer",
+	    "attributes": {
+	            "firstName": "Abhi",
+	            "lastName": "Panth",
+	            "addressLine1": "wolli creek",
+	            "addressLine2": "wolli creek",
+	            "suburb": "sydney",
+	            "state": "NSW",
+	            "postCode": "2735",
+	            "country": "AUSTRALIA"
+	        }
+	}
+}

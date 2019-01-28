@@ -1,0 +1,13 @@
+{
+    "errors": [
+        {
+            "status": "404",
+            "code": "APP",
+            "source": {
+                "pointer": "/customer/businesses/{abn}"
+            },
+            "title": "Subject of your enquiry was not found.",
+            "detail": "Subject of your enquiry was not found."
+        }
+    ]
+}

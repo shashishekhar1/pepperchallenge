@@ -1,0 +1,30 @@
+{
+	"type": "GetCustomers",
+	"nextRequestingTimeStamp": 1548123212,
+    "data": [
+         {
+        	"id": "1",
+            "firstName": "Mark",
+            "lastName": "Yang",
+            "addressLine1": "u 234A",
+            "addressLine2": "",
+            "suburb": "Test",
+            "state": "Queensland",
+            "postCode": "4814",
+            "country": "AUSTRALIA",
+            "link": "https://api.customer.com/cust-001"
+        },
+        {
+        	"id": "2",
+            "firstName": "David",
+            "lastName": "Yang",
+            "addressLine1": "u 235A",
+            "addressLine2": "",
+            "suburb": "Test",
+            "state": "Queensland",
+            "postCode": "4814",
+            "country": "AUSTRALIA",
+            "link": "https://api.customer.com/cust-002"
+        }
+    ]
+}

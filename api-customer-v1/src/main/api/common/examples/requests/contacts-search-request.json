@@ -1,0 +1,7 @@
+{
+    "data": 
+    	"type": "ListCustomers",
+	    "attributes": {
+	    		"nextRequestingTimeStamp": 1548123212,
+	        }
+}

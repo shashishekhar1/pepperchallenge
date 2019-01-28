@@ -1,0 +1,12 @@
+#%RAML 1.0 Trait
+description: The headers used for tracking transactions end-to-end
+usage: Apply to all operations
+
+headers:
+  X-TrackingID:
+    description: |
+      Consumer system's tracking ID for this request (if any).
+      This is optional and purely for troubleshooting / analysis purposes.
+    type: string
+    required: false
+    example: 935c44b7-84ec-40d9-88ff-d5dab2447f07

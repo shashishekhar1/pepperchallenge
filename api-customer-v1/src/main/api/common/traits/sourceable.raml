@@ -1,0 +1,12 @@
+#%RAML 1.0 Trait
+description: The headers used for tracking transactions end-to-end
+usage: Apply to all operations
+
+headers:
+  X-SourceSystem:
+    description: |
+      The source system identification code representing for the system initiating this request. This fields is used to provide traceability for API calls.
+    type: string
+    minLength: 1
+    required: true
+    example: GWCC

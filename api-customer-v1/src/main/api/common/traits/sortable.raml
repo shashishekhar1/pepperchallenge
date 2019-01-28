@@ -1,0 +1,14 @@
+#%RAML 1.0 Trait
+description: The parameters for sorting records in the results
+usage: Apply this to GET operations that return collections
+
+queryParameters:
+  sortBy:
+    description: "Fields to sort by: <<fieldsList>>"
+    type: string
+    required: false
+  sort:
+    description: The sorting order
+    enum: [ desc, asc ]
+    default: desc
+    required: false

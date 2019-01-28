@@ -1,0 +1,15 @@
+{
+  "errors": [{
+      "status": 400,
+      "title": "Operation could not be completed",
+      "code": "INVALID_REQUEST",
+      "detail": "Target system (Salesforce) returned the following error:  FIELD_CUSTOM_VALIDATION_EXCEPTION A First Name must be provided in order to save",
+    },
+    {
+      "status": 400,
+      "title": "Operation could not be completed",
+      "code": "INVALID_REQUEST",
+      "detail": "Target system (Salesforce) returned the following error:  FIELD_CUSTOM_VALIDATION_EXCEPTION Either an Email or Phone Number must be provided in order to save"
+    }
+  ]
+}

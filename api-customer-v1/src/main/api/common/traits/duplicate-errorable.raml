@@ -1,0 +1,19 @@
+#%RAML 1.0 Trait
+description: Common error responses returned by an API
+usage: Apply to all operations
+
+responses:
+  409:
+    description: Conflict. This usually occurs where a consumer has attempted to create a new record which already exists in the system
+    body:
+      application/json:
+        type: !include ../data-types/json-api.schema.json
+        example: |
+          {
+            "errors": [
+              {
+                "code": "NotAcceptable",
+                "detail": "You must accept application/vnd.api+json to use this resource."
+              }
+            ]
+          }

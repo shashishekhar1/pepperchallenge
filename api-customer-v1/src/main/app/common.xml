@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:utils="http://www.mulesoft.org/schema/mule/utils"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/utils http://www.mulesoft.org/schema/mule/utils/current/mule-utils.xsd
+http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+    <sub-flow name="db-create-customer-flow">
+        <logger message="#[payload]" level="DEBUG" category="db-create-flow" doc:name="Request"/>
+        <db:insert config-ref="MySQL_Configuration" doc:name="Database" >
+            <db:parameterized-query><![CDATA[INSERT INTO customers (firstname, lastname, addressLine1, addressLine2, suburb, state, postCode, country, timestamp1) values 
+(#[flowVars.firstName], #[flowVars.lastName], #[flowVars.addressLine1], #[flowVars.addressLine2], #[flowVars.suburb], #[flowVars.state1], #[flowVars.postCode], #[flowVars.country], #[flowVars.timestamp1])]]></db:parameterized-query>
+        </db:insert>
+        <logger message="#[payload]" level="DEBUG" category="db-create-flow" doc:name="Response"/>
+    </sub-flow>
+
+    <sub-flow name="db-get-customer-db-flow">
+    	<logger message="#[payload]" level="DEBUG" category="db-get-flow" doc:name="Request"/>
+        <db:select config-ref="MySQL_Configuration" doc:name="Database">
+            <db:parameterized-query><![CDATA[select id, firstname, lastname, addressLine1, addressLine2, suburb, state, postCode, country
+             from customers WHERE TIMESTAMP1 >= #[flowVars.requestedTimestamp]]]></db:parameterized-query>
+        </db:select>
+        <logger message="#[payload]" level="DEBUG" category="db-get-flow" doc:name="Response"/>
+    </sub-flow>
+
+    <sub-flow name="db-get-customer-by-id-flow">
+    	<logger message="#[payload]" level="DEBUG" category="db-get-flow" doc:name="Request"/>
+        <db:select config-ref="MySQL_Configuration" doc:name="Database">
+            <db:parameterized-query><![CDATA[select id, firstname, lastname, addressLine1, addressLine2, suburb, state, postCode, country
+             from customers WHERE id = #[flowVars.id]]]></db:parameterized-query>
+        </db:select>
+        <logger message="#[payload]" level="DEBUG" category="db-get-flow" doc:name="Response"/>
+    </sub-flow>
+
+    <sub-flow name="db-update-customer-flow">
+    	<logger message="#[payload]" level="DEBUG" category="db-update-flow" doc:name="Request"/>
+        <db:update config-ref="MySQL_Configuration" doc:name="Database" >
+            <db:parameterized-query><![CDATA[UPDATE customers SET firstname = #[flowVars.firstName], lastname = #[flowVars.lastName], 
+addressLine1 = #[flowVars.addressLine1], addressLine2 = #[flowVars.addressLine2],
+suburb = #[flowVars.suburb], state = #[flowVars.state1], postCode = #[flowVars.postCode],
+country = #[flowVars.country], timestamp1 = #[flowVars.timestamp1]
+WHERE id = #[flowVars.id]]]></db:parameterized-query>
+		 
+        </db:update>
+        <logger message="#[payload]" level="DEBUG" category="db-update-flow" doc:name="Response"/>
+    </sub-flow>
+    <sub-flow name="db-delete-customer-flow">
+    	<logger message="#[payload]" level="DEBUG" category="db-delete-flow" doc:name="Request"/>
+        <db:delete config-ref="MySQL_Configuration" doc:name="Database" >
+            <db:parameterized-query><![CDATA[DELETE from customers WHERE id = #[flowVars.id]]]></db:parameterized-query>
+        </db:delete>
+        <logger message="#[payload]" level="DEBUG" category="db-delete-flow" doc:name="Response"/>
+    </sub-flow>
+</mule>

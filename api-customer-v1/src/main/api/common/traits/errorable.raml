@@ -1,0 +1,133 @@
+#%RAML 1.0 Trait
+description: Common error responses returned by an API
+usage: Apply to all operations
+
+responses:
+  400:
+    description: Bad request
+    body:
+      application/vnd.api+json:
+        type: !include ../data-types/json-api.schema.json
+        example: |
+          {
+            "errors": [
+              {
+                "status": "400",
+                "title": "Operation could not be completed",
+                "code": "INVALID_REQUEST",
+                "detail": "Operation could not be completed as an invalid set of request data was provided"
+              }
+            ]
+          }
+  401:
+    description: Unauthorised request
+    body:
+      application/vnd.api+json:
+        type: !include ../data-types/json-api.schema.json
+        example: |
+          {
+            "errors": [
+              {
+                "code": "AuthorisationFailed",
+                "detail": "You must include authorisation details for the request."
+              }
+            ]
+          }
+  403:
+    description: Forbidden
+    body:
+      application/vnd.api+json:
+        type: !include ../data-types/json-api.schema.json
+        example: |
+          {
+            "errors": [
+              {
+                "code": "UserWithoutAuthority",
+                "detail": "You cannot access this resource."
+              }
+            ]
+          }
+  404:
+    description: Resource not found
+    body:
+      application/vnd.api+json:
+        type: !include ../data-types/json-api.schema.json
+        example: |
+          {
+            "errors": [
+              {
+                "code": "ImageNotFound",
+                "detail": "The image you requested is missing."
+              }
+            ]
+          }
+  405:
+    description: Method not allowed
+    body:
+      application/vnd.api+json:
+        type: !include ../data-types/json-api.schema.json
+        example: |
+          {
+            "errors": [
+              {
+                "code": "InvalidMethod",
+                "detail": "You cannot use POST for this resource."
+              }
+            ]
+          }
+  406:
+    description: Not acceptable
+    body:
+      application/vnd.api+json:
+        type: !include ../data-types/json-api.schema.json
+        example: |
+          {
+            "errors": [
+              {
+                "code": "NotAcceptable",
+                "detail": "You must accept application/vnd.api+json to use this resource."
+              }
+            ]
+          }
+  409:
+    description: Duplicates
+    body:
+      application/vnd.api+json:
+        type: !include ../data-types/json-api.schema.json
+        example: |
+          {
+            "errors": [
+              {
+                "code": "Duplicate",
+                "detail": "Duplicates found"
+              }
+            ]
+          }
+  415:
+    description: Unsupported media type
+    body:
+      application/vnd.api+json:
+        type: !include ../data-types/json-api.schema.json
+        example: |
+          {
+            "errors": [
+              {
+                "code": "MediaTypeIncorrect",
+                "detail": "You must send application/vnd.api+json to use this resource."
+              }
+            ]
+          }
+  500:
+    description: Server error
+    body:
+      application/vnd.api+json:
+        type: !include ../data-types/json-api.schema.json
+        example: |
+          {
+            "errors": [
+              {
+                "code": "ServiceLinkDown",
+                "detail": "A vital service link is currently unavailable, and we cannot fulfill the request, please try again later."
+              }
+            ]
+          }

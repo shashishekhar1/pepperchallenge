@@ -1,0 +1,87 @@
+#%RAML 1.0
+title: Customer API
+version: v1
+
+mediaType: [application/json]
+baseUri: https://api.pepper.com/v1/customer
+description: Pepper Customer API v1.
+
+traits:
+  Countable: !include common/traits/countable.raml
+  Pageable: !include common/traits/pageable.raml
+  Sortable: !include common/traits/sortable.raml
+  Errorable: !include common/traits/errorable.raml
+  DuplicateErrorable: !include common/traits/duplicate-errorable.raml
+  Trackable: !include common/traits/trackable.raml
+  Sourceable: !include common/traits/sourceable.raml
+  Cacheable: !include common/traits/cacheable.raml
+  TimeCacheable: !include common/traits/time-cacheable.raml
+  ContentCacheable: !include common/traits/content-cacheable.raml
+
+types:
+  JsonAPI: !include common/data-types/json-api.schema.json
+
+/customers:
+  get:
+    description: |
+      Fetch list of customers updated after given timestamp.
+    is: [Sourceable, Trackable, Errorable, TimeCacheable, ContentCacheable]
+    queryParameters:
+          lastRequestedTimestamp:
+            description: Retrieve a specific address using its ID
+            type: string
+            required: false
+    responses:
+      200:
+          body:
+            application/vnd.api+json:
+              example: !include common/examples/responses/get-customer-response.json
+  post:
+    description: |
+      Add a new customer
+    is: [Sourceable, Trackable, Errorable, TimeCacheable, ContentCacheable]
+    body:
+      application/vnd.api+json:
+              example: !include common/examples/requests/post-add-customer-request.json
+    responses:
+            201:
+              body:
+                application/vnd.api+json:
+                    example: !include common/examples/responses/post-add-customer-response.json
+  /{id}:
+      patch:
+        description: |
+          Update details of an existing customer
+        is: [Sourceable, Trackable, Errorable, TimeCacheable, ContentCacheable]
+        body:
+          application/vnd.api+json:
+                  example: !include common/examples/requests/patch-update-customer-request.json
+        responses:
+                200:
+                  body:
+                    application/vnd.api+json:
+                        example: !include common/examples/responses/patch-update-customer-response.json
+                404:
+      delete:
+        description: |
+          Deleted an existing customer
+        is: [Sourceable, Trackable, Errorable, TimeCacheable, ContentCacheable]
+        body:
+          application/vnd.api+json:
+                  example: !include common/examples/requests/delete-customer-request.json
+        responses:
+                200:
+                  body:
+                    application/vnd.api+json:
+                        example: !include common/examples/responses/delete-customer-response.json
+                404:
+      get:
+        description: |
+          Get customer by id
+        is: [Sourceable, Trackable, Errorable, TimeCacheable, ContentCacheable]
+        responses:
+                200:
+                  body:
+                    application/vnd.api+json:
+                        example: !include common/examples/responses/get-customer-by-id-response.json
+                404:

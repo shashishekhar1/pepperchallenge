@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ws="http://www.mulesoft.org/schema/mule/ws" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:api-platform-gw="http://www.mulesoft.org/schema/mule/api-platform-gw"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:utils="http://www.mulesoft.org/schema/mule/utils"
+	xmlns:s3="http://www.mulesoft.org/schema/mule/s3" xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/utils http://www.mulesoft.org/schema/mule/utils/current/mule-utils.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/api-platform-gw http://www.mulesoft.org/schema/mule/api-platform-gw/current/mule-api-platform-gw.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+	<context:property-placeholder location="${mule.env}.properties" />
+
+	<apikit:config name="api-config" raml="api.raml" consoleEnabled="true" consolePath="console" keepRamlBaseUri="false" doc:name="Router"/>
+
+	<http:listener-config name="HTTP_Listener_Configuration"
+		host="0.0.0.0" port="${http.private.port}" doc:name="HTTP Listener Configuration" />
+
+	<spring:beans>
+		<spring:import resource="spring-beans.xml" />
+	</spring:beans>
+
+	<db:mysql-config name="MySQL_Configuration" 
+					 host="${customer.mysql.db.hostname}" 
+					 port="${customer.mysql.db.port}" 
+					 user="${customer.mysql.db.username}" 
+					 password="${customer.mysql.db.password}" 
+					 database="${customer.mysql.db.database}" 
+					 doc:name="MySQL Configuration"/>
+</mule>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:mock="http://www.mulesoft.org/schema/mule/mock"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/mock http://www.mulesoft.org/schema/mule/mock/current/mule-mock.xsd
+http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+    <munit:config name="munit" mock-connectors="false" mock-inbounds="false" doc:name="MUnit configuration" />
+    <spring:beans>
+        <spring:import resource="classpath:customer-tech-adapter.xml"/>
+        <spring:import resource="classpath:config.xml"/>
+        <spring:import resource="classpath:common.xml"/>
+        <spring:import resource="classpath:api.xml"/>
+        <spring:import resource="classpath:error-flow.xml"/>
+        <spring:import resource="classpath:testmockscripts.xml"/>
+    </spring:beans>
+    <munit:test name="new-test-suite-create-customers-flowTest" description="Test">
+    	<mock:when messageProcessor=".*:.*" doc:name="Mock create-customer-db-response">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="#[matchContains('db-create-customer-flow')]"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[1]" mimeType="application/json">
+                <mock:outbound-properties>
+                    <mock:outbound-property key="http.status" value="201"/>
+                </mock:outbound-properties>
+            </mock:then-return>
+		</mock:when>
+		<munit:set payload="#[getResource('mocks/post-customer-request-mock.json').asStream()]" mimeType="application/json"
+			doc:name="Set Message" />
+        <flow-ref name="add-customers-flow" doc:name="Flow-ref to add-customers-flow"/>
+        <json:json-to-object-transformer returnClass="java.util.HashMap" doc:name="JSON to Object"/>
+        <munit:assert-not-null doc:name="Assert Not Null Payload"/>
+        <munit:assert-true message="Response Type does not match" condition="#[payload.type == 'CreateCustomer']" doc:name="Assert True"/>
+        <munit:assert-true condition="#[payload.attributes.status == 'Created']" doc:name="Assert True"/>
+    </munit:test>
+    
+    <munit:test name="new-test-suite-update-customers-success-flowTest" description="Test">
+    	<mock:when messageProcessor=".*:.*" doc:name="Mock create-customer-db-response">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="#[matchContains('db-update-customer-flow')]"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[1]" mimeType="application/json">
+                <mock:outbound-properties>
+                    <mock:outbound-property key="http.status" value="200"/>
+                </mock:outbound-properties>
+            </mock:then-return>
+		</mock:when>
+		<munit:set payload="#[getResource('mocks/patch-customer-request-mock.json').asStream()]" mimeType="application/json"
+			doc:name="Set Message" />
+        <flow-ref name="update-customers-flow" doc:name="Flow-ref to update-customers-flow"/>
+        <json:json-to-object-transformer returnClass="java.util.HashMap" doc:name="JSON to Object"/>
+        <munit:assert-not-null doc:name="Assert Not Null Payload"/>
+        <munit:assert-true message="Response Type does not match" condition="#[payload.type == 'UpdateCustomer']" doc:name="Assert True"/>
+        <munit:assert-true condition="#[payload.attributes.firstname == 'Abhi']" doc:name="Assert True"/>
+        <munit:assert-true condition="#[message.outboundProperties.'http.status' == 200]" doc:name="Assert http status"/>
+    </munit:test>
+    
+    <munit:test name="new-test-suite-update-customers-error-flowTest" description="Test">
+    	<mock:when messageProcessor=".*:.*" doc:name="Mock create-customer-db-response">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="#[matchContains('db-update-customer-flow')]"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[0]" mimeType="application/json">
+                <mock:outbound-properties>
+                    <mock:outbound-property key="http.status" value="200"/>
+                </mock:outbound-properties>
+            </mock:then-return>
+		</mock:when>
+		<munit:set payload="#[getResource('mocks/patch-customer-request-mock.json').asStream()]" mimeType="application/json"
+			doc:name="Set Message" />
+        <flow-ref name="update-customers-flow" doc:name="Flow-ref to update-customers-flow"/>
+        <munit:assert-true condition="#[message.outboundProperties.'http.status' == 404]" doc:name="Assert http status"/>
+    </munit:test>
+    
+    <munit:test name="new-test-suite-delete-customers-success-flowTest" description="Test">
+    	<mock:when messageProcessor=".*:.*" doc:name="Mock create-customer-db-response">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="#[matchContains('db-delete-customer-flow')]"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[1]" mimeType="application/json">
+                <mock:outbound-properties>
+                    <mock:outbound-property key="http.status" value="200"/>
+                </mock:outbound-properties>
+            </mock:then-return>
+		</mock:when>
+
+        <flow-ref name="delete-customers-flow" doc:name="Flow-ref to delete-customers-flow"/>
+        <json:json-to-object-transformer returnClass="java.util.HashMap" doc:name="JSON to Object"/>
+        <munit:assert-not-null doc:name="Assert Not Null Payload"/>
+        <munit:assert-true message="Response Type does not match" condition="#[payload.type == 'DeleteCustomer']" doc:name="Assert True"/>
+        <munit:assert-true condition="#[payload.attributes.status == 'deleted']" doc:name="Assert True"/>
+        <munit:assert-true condition="#[message.outboundProperties.'http.status' == 200]" doc:name="Assert http status"/>
+    </munit:test>
+    
+    <munit:test name="new-test-suite-delete-customers-error-flowTest" description="Test">
+    	<mock:when messageProcessor=".*:.*" doc:name="Mock create-customer-db-response">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="#[matchContains('db-delete-customer-flow')]"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[0]" mimeType="application/json">
+                <mock:outbound-properties>
+                    <mock:outbound-property key="http.status" value="200"/>
+                </mock:outbound-properties>
+            </mock:then-return>
+		</mock:when>
+		
+        <flow-ref name="delete-customers-flow" doc:name="Flow-ref to delete-customers-flow"/>
+        <munit:assert-true condition="#[message.outboundProperties.'http.status' == 404]" doc:name="Assert http status"/>
+    </munit:test>
+    
+    <munit:test name="new-test-suite-get-customers-flowTest" description="Test">
+    	<mock:when messageProcessor=".*:.*" doc:name="Mock create-customer-db-response">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="#[matchContains('db-get-customer-db-flow')]"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[resultOfScript('getCustomerMockResponseGenerator')]" mimeType="application/java">
+                <mock:outbound-properties>
+                    <mock:outbound-property key="http.status" value="200"/>
+                </mock:outbound-properties>
+            </mock:then-return>
+		</mock:when>
+        <flow-ref name="get-customers-flow" doc:name="Flow-ref to get-customers-flow"/>
+        <json:json-to-object-transformer returnClass="java.util.HashMap" doc:name="JSON to Object"/>
+        <munit:assert-not-null doc:name="Assert Not Null Payload"/>
+        <munit:assert-true message="Response Type does not match" condition="#[payload.type == 'GetCustomers']" doc:name="Assert True"/>
+        <munit:assert-true message="Size of payload does not match" condition="#[payload.data.size() == 2]" doc:name="Assert True"/>
+    </munit:test>
+    
+    <munit:test name="new-test-suite-get-customers-by-id-flowTest" description="Test">
+    	<mock:when messageProcessor=".*:.*" doc:name="Mock create-customer-db-response">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="#[matchContains('db-get-customer-by-id-flow')]"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[resultOfScript('getCustomerByIdMockResponseGenerator')]" mimeType="application/java">
+                <mock:outbound-properties>
+                    <mock:outbound-property key="http.status" value="200"/>
+                </mock:outbound-properties>
+            </mock:then-return>
+		</mock:when>
+        <flow-ref name="get-customers-by-id-flow" doc:name="Flow-ref to get-customers-by-id-flow"/>
+        <json:json-to-object-transformer returnClass="java.util.HashMap" doc:name="JSON to Object"/>
+        <munit:assert-not-null doc:name="Assert Not Null Payload"/>
+        <munit:assert-true message="Response Type does not match" condition="#[payload.type == 'GetCustomers']" doc:name="Assert True"/>
+        <munit:assert-true message="payload id does not match" condition="#[payload.data.id == '5']" doc:name="Assert True"/>
+        <munit:assert-true message="payload link does not match" condition="#[payload.data.link == 'https://api.pepper.com/v1/customer/5']" doc:name="Assert True"/>
+    </munit:test>
+</mule>

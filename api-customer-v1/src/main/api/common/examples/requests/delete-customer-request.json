@@ -1,0 +1,16 @@
+{
+    "data": 
+    	"type": "DeleteCustomer",
+	    "attributes": {
+	    		"id": "cust-001",
+	            "firstName": "Mark",
+	            "lastName": "Yang",
+	            "addressLine1": "u 234A",
+	            "addressLine2": "",
+	            "suburb": "Test",
+	            "state": "Queensland",
+	            "postCode": "4814",
+	            "country": "AUSTRALIA",
+	            "link": "https://api.customer.com/cust-001"
+	        }
+}

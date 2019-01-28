@@ -1,0 +1,14 @@
+{
+  "name": "api-customer-v1",
+  "runtime": "3.8.5",
+  "workers": "1",
+  "workerSize": "0.1",
+  "region": "ap-southeast-2",
+  "persistentQueues": false,
+  "persistentQueuesEncrypted": false,
+  "staticIPsEnabled": false,
+  "autoRestart": true,
+  "apiName": "Customer Api",
+  "apiVersion": "v1",
+  "policyList": []
+}

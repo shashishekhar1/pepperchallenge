@@ -1,0 +1,16 @@
+{
+    "data": {
+    	"type": "UpdateCustomer",
+	    "attributes": {
+	    		"id":"1",
+	            "firstName": "Abhi",
+	            "lastName": "Panth",
+	            "addressLine1": "309 Kent Street",
+	            "addressLine2": "floor 19",
+	            "suburb": "Barangroo",
+	            "state": "NSW",
+	            "postCode": "2000",
+	            "country": "AUSTRALIA"
+	        }
+	}
+}

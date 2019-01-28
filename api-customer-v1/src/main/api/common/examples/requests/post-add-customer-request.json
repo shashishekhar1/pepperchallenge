@@ -1,0 +1,15 @@
+{
+    "data": {
+    	"type": "CreateCustomer",
+	    "attributes": {
+	            "firstName": "Mark",
+	            "lastName": "Yang",
+	            "addressLine1": "u 234A",
+	            "addressLine2": "testing",
+	            "suburb": "Parramatta",
+	            "state": "NSW",
+	            "postCode": "2350",
+	            "country": "AUSTRALIA"
+	        }
+	}
+}
