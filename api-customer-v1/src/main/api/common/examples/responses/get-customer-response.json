@@ -1,7 +1,7 @@
 {
 	"type": "GetCustomers",
 	"nextRequestingTimeStamp": "2019-01-27 08:59:12",
-	"lastRequestedTimeStamp": "2019-01-27 08:59:12"
+	"lastRequestedTimeStamp": "2019-01-27 08:59:12",
     "data": [
          {
         	"id": "1",
