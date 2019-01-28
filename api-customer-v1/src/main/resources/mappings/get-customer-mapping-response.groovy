@@ -14,10 +14,12 @@ use( TimeCategory ) {
 }
 
 def timestamp = after5Mins.format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone('UTC'))
+def curretimestamp = now.format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone('UTC'))
 
 def root = [
     type: "GetCustomers",
     nextRequestingTimeStamp: timestamp,
+    lastRequestedTimeStamp: curretimestamp,
     data: 
         result.collect { it -> [
                 id: it?.id,
